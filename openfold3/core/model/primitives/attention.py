@@ -46,7 +46,10 @@ if deepspeed_is_installed:
 if ds4s_is_installed:
     from deepspeed.ops.deepspeed4science import DS4Sci_EvoformerAttention
 
-cueq_is_installed = importlib.util.find_spec("cuequivariance_torch") is not None
+cueq_is_installed = (
+    importlib.util.find_spec("cuequivariance_torch") is not None
+    and torch.cuda.is_available()
+)
 if cueq_is_installed:
     from cuequivariance_ops_torch.triangle_attention import (
         CUEQ_TRIATTN_FALLBACK_THRESHOLD,

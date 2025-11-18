@@ -1,5 +1,5 @@
 # Full performance multi-stage build with complete CUDA toolchain
-FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04 AS builder
+FROM nvidia/cuda:12.6.1-cudnn-devel-ubuntu22.04 AS builder
 
 # Install complete build dependencies including CUDA compiler tools
 RUN apt-get update && apt-get install -y \
@@ -35,7 +35,7 @@ RUN /opt/openfold3/scripts/install_third_party_dependencies.sh
 
 # Install the package
 WORKDIR /opt/openfold3
-RUN python3 setup.py install
+RUN pip install '.[cuequivariance]' --no-build-isolation && python setup.py install
 
 # Set CUDA architecture for compilation (adjust based on your GPU)
 ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0"
@@ -45,7 +45,7 @@ ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0"
 #     python3 -c "import deepspeed; print('DeepSpeed ops loaded successfully')"
 
 # Runtime stage - use devel image for full CUDA support
-FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04 AS runtime
+FROM nvidia/cuda:12.6.1-cudnn-devel-ubuntu22.04 AS runtime
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
