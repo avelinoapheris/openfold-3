@@ -39,7 +39,7 @@ RUN /opt/openfold3/scripts/install_third_party_dependencies.sh
 
 # Install the package
 WORKDIR /opt/openfold3
-RUN python3 -m pip install .
+RUN python3 -m pip install --editable .
 
 # Set CUDA architecture for compilation (adjust based on your GPU)
 ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0"
@@ -101,4 +101,4 @@ COPY environments/requirements-test.txt /opt/openfold3/requirements-test.txt
 
 WORKDIR /opt/openfold3
 RUN pip install -r requirements-test.txt
-RUN pip install --force-reinstall --no-deps .
+RUN pip install --no-deps --editable .
