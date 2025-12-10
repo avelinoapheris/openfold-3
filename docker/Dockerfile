@@ -92,3 +92,12 @@ ENV LD_LIBRARY_PATH=/opt/conda/lib:$LD_LIBRARY_PATH
 COPY . /opt/openfold3
 
 WORKDIR /opt/openfold3
+
+# Test stage - build on devel layer with test dependencies
+FROM devel AS test
+
+COPY environments/requirements-test.txt /opt/openfold3/requirements-test.txt
+
+WORKDIR /opt/openfold3
+RUN pip install -r requirements-test.txt
+RUN pip install --force-reinstall --no-deps .

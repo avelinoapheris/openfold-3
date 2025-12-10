@@ -2,21 +2,27 @@
 
 TODO
 
+For Blackwell image build, see [Build_instructions_blackwell.md](Build_instructions_blackwell.md)
+
 ## Development images
 
 These images are the biggest but come with all the build tooling, needed to compile things at runtime (Deepspeed)
 
 ```
-docker build -f docker/development/Dockerfile -t openfold-docker:latest .
+docker build \
+    -f docker/development/Dockerfile \
+    --target devel \
+    -t openfold-docker:devel .
 ```
-
-For Blackwell image build, see [Build_instructions_blackwell.md](Build_instructions_blackwell.md)
 
 ## Test images
 
 Build the test image
 ```
-docker build -f docker/test/Dockerfile -t openfold-docker:tests .
+docker build \
+    -f docker/development/Dockerfile \
+    --target test \
+    -t openfold-docker:tests .
 ```
 
 Run the unit tests
