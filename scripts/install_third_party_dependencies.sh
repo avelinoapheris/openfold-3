@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -e
+# -e (errexit): Exit immediately if any command returns a non-zero exit status
+# -u (nounset): Exit if you try to use an uninitialized variable
+# -o pipefail: Exit if any command in a pipeline fails (not just the last one)
+set -euo pipefail
 
 echo "Download CUTLASS, required for Deepspeed Evoformer attention kernel"
 git clone https://github.com/NVIDIA/cutlass --branch v3.6.0 --depth 1
