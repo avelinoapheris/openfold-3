@@ -52,7 +52,7 @@ ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0"
 #     python3 -c "import deepspeed; print('DeepSpeed ops loaded successfully')"
 
 # Devel stage - use devel image for full CUDA support
-FROM nvidia/cuda:12.1.1-cudnn8-devel-ubuntu22.04 AS devel
+FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04 AS devel
 
 # Install devel dependencies
 RUN apt-get update && apt-get install -y \
