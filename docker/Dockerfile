@@ -1,5 +1,6 @@
 # Full performance multi-stage build with complete CUDA toolchain
-FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04 AS builder
+ARG CUDA_BASE_IMAGE_TAG=12.2.2-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:${CUDA_BASE_IMAGE_TAG} AS builder
 
 # Install complete build dependencies including CUDA compiler tools
 RUN apt-get update && apt-get install -y \
@@ -52,7 +53,8 @@ ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;9.0"
 #     python3 -c "import deepspeed; print('DeepSpeed ops loaded successfully')"
 
 # Devel stage - use devel image for full CUDA support
-FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04 AS devel
+ARG CUDA_BASE_IMAGE_TAG=12.2.2-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:${CUDA_BASE_IMAGE_TAG} AS devel
 
 # Install devel dependencies
 RUN apt-get update && apt-get install -y \
