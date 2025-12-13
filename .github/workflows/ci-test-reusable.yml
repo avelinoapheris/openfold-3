@@ -1,6 +1,7 @@
 name: Reusable Docker Test
 
 on:
+  # Can only be called by another workflow, not directly by the user
   workflow_call:
     inputs:
       cuda_base_image_tag:
