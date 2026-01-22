@@ -18,7 +18,6 @@ Triangle multiplicative update layers. Includes TriangleMultiplicativeUpdate fro
 and FusedTriangleMultiplicativeUpdate from AF2-Multimer.
 """
 
-import importlib
 import warnings
 from abc import ABC, abstractmethod
 from functools import partialmethod
@@ -28,13 +27,9 @@ import torch.nn as nn
 
 import openfold3.core.config.default_linear_init_config as lin_init
 from openfold3.core.model.primitives import LayerNorm, Linear
-from openfold3.core.utils.tensor_utils import permute_final_dims
+from openfold3.core.utils.tensor_utils import permute_final_dims, is_cuequivariance_available
 
-cueq_is_installed = (
-    importlib.util.find_spec("cuequivariance_torch") is not None
-    and torch.cuda.is_available()
-)
-if cueq_is_installed:
+if is_cuequivariance_available():
     from cuequivariance_torch import triangle_multiplicative_update
 
 

@@ -13,11 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib.util
 from functools import partial
 
 import torch
 import torch.nn as nn
 from biotite.structure import AtomArray
+
+
+def is_cuequivariance_available() -> bool:
+    """
+    Check if cuequivariance_torch is installed and CUDA is available.
+    Even if cuequivariance_torch is installed, it only works with CUDA.
+    """
+    return (
+        importlib.util.find_spec("cuequivariance_torch") is not None
+        and torch.cuda.is_available()
+    )
 
 
 def add(m1, m2, inplace):
