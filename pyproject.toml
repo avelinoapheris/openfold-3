@@ -61,11 +61,21 @@ Repository = "https://github.com/aqlaboratory/openfold-3"
 run_openfold="openfold3.run_openfold:cli"
 setup_openfold="openfold3.setup_openfold:main"
 
+[dependency-groups]
+test = [
+  "pytest",
+  "ruff",
+  "awscli",
+  "aria2",
+  "pytest-xdist",
+  "pytest-cov",
+  "pytest-benchmark",
+]
+
 [project.optional-dependencies]
 dev = [
   "pytest",
   "ruff",
-
   # used for documentation
   "sphinx",
   "myst-parser",
@@ -83,7 +93,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["openfold3*"] 
+include = ["openfold3*", "scripts*"] 
 
 [tool.setuptools.package-data]
 openfold3 = [
@@ -135,6 +145,9 @@ ignore = [
     "B905",  # explicit strict= for zip
 ]
 extend-safe-fixes = ["UP006"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["E501"]
 
 [tool.pytest.ini_options]
 log_cli = true
