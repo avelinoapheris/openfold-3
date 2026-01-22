@@ -203,7 +203,7 @@ def sample_templates(
     else:
         k = np.min([np.random.randint(0, l), n_templates])
 
-    if (k > 0) and (template_cache_directory is not None):
+    if k > 0 and template_cache_directory is not None:
         # Load template cache entry numpy file
         # From the representative ID during training
         if "alignment_representative_id" in chain_data:

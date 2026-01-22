@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from turtle import save
 
 import logging
 import os
@@ -80,15 +81,16 @@ def _maybe_download_parameters(target_path: Path) -> None:
 
 class CheckpointConfig(BaseModel):
     """Settings for training checkpoint writing."""
-
-    model_config = PydanticConfigDict(extra="allow")
     monitor: str | None = None
+    mode: str | None  = None
     every_n_epochs: int = 1
     auto_insert_metric_name: bool = False
     filename: str | None = None
     enable_version_counter: bool = True
     save_last: bool = True
     save_top_k: int = -1
+    every_n_train_steps: int | None = None
+    save_on_train_epoch_end: bool | None = None
 
 
 class WandbConfig(BaseModel):
