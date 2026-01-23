@@ -47,7 +47,6 @@ RUN mamba install -n base -c conda-forge conda-lock --yes \
        fi \
     && mamba clean --all --yes \
     && conda clean --all --yes
-
 # Activate the openfold3 environment by default
 ENV PATH=/opt/conda/envs/openfold3/bin:$PATH
 ENV CONDA_PREFIX=/opt/conda/envs/openfold3
@@ -135,6 +134,6 @@ WORKDIR /opt/openfold3
 # Test stage - build on devel layer with test dependencies
 FROM devel AS test
 WORKDIR /opt/openfold3
-# Install test dependencies and package
-RUN uv pip install --group=test \
-    && uv pip install --no-deps --editable ".";
+# Only uv supports --dependency-groups from pyproject.toml
+RUN uv pip install --group=test
+RUN uv pip install --no-deps --editable .

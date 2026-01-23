@@ -31,9 +31,7 @@ dependencies:
   - bioconda::kalign2
   - bioconda::snakemake
   - pytorch::pytorch
-  - conda-forge::cuda-version=12.6     # ← Force CUDA 12.6
-  - conda-forge::libcublas>=12.6.1     # ← Ensure cuBLAS 12.6.1+
-  # - pytorch::pytorch-cuda
+  - pytorch::pytorch-cuda
   - memory_profiler
   - func_timeout
   - boto3
