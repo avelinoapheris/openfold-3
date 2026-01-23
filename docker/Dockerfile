@@ -1,10 +1,12 @@
 # Full performance multi-stage build with complete CUDA toolchain
 #
 # For cuEquivariance support, build with:
-# docker build --build-arg INSTALL_CUEQ=true --build-arg CUDA_BASE_IMAGE_TAG=12.6.1-cudnn-devel-ubuntu22.04 .
+# docker build --build-arg INSTALL_CUEQ=true --build-arg CUDA_BASE_IMAGE_TAG=12.6.1-cudnn-devel-ubuntu22.04 --build-arg BUILD_MODE=yaml .
 #
-ARG INSTALL_CUEQ=false
 ARG CUDA_BASE_IMAGE_TAG=12.1.1-cudnn8-devel-ubuntu22.04
+ARG INSTALL_CUEQ=false
+
+
 FROM nvidia/cuda:${CUDA_BASE_IMAGE_TAG} AS builder
 
 # Environment mode: "lock" for reproducible builds, "yaml" for flexible dev builds
@@ -67,9 +69,9 @@ RUN /opt/openfold3/scripts/install_third_party_dependencies.sh
 # Install the package
 WORKDIR /opt/openfold3
 RUN if [ "$INSTALL_CUEQ" = "true" ]; then \
-        uv pip install --no-deps --editable '.[cuequivariance]'; \
+        uv pip install --no-build-isolation --editable ".[cuequivariance]"; \
     else \
-        uv pip install --no-deps --editable .; \
+        uv pip install --no-deps --editable "."; \
     fi
 
 # Set CUDA architecture for compilation (adjust based on your GPU)
@@ -113,6 +115,7 @@ COPY --from=builder /opt/conda /opt/conda
 # Copy CUTLASS
 COPY --from=builder /opt/cutlass /opt/cutlass
 
+
 # Activate the openfold3 environment by default
 ENV PATH=/opt/conda/envs/openfold3/bin:/opt/conda/bin:$PATH
 ENV CONDA_PREFIX=/opt/conda/envs/openfold3
@@ -135,15 +138,11 @@ WORKDIR /opt/openfold3
 
 # Test stage - build on devel layer with test dependencies
 FROM devel AS test
-
-ARG INSTALL_CUEQ=false
-
 WORKDIR /opt/openfold3
-# Only uv supports --dependency-groups from pyproject.toml (not used with cuEquivariance)
-RUN if [ "$INSTALL_CUEQ" = "true" ]; then \
-        echo "Test stage not supported with cuEquivariance variant"; \
-        exit 1; \
+# Install test dependencies and package
+RUN uv pip install --group=test \
+    && if [ "$INSTALL_CUEQ" = "true" ]; then \
+        uv pip install --no-build-isolation --editable ".[cuequivariance]"; \
     else \
-        uv pip install --group=test; \
-        uv pip install --no-deps --editable .; \
+        uv pip install --no-deps --editable "."; \
     fi
