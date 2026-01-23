@@ -1,13 +1,9 @@
 # Full performance multi-stage build with complete CUDA toolchain
-#
-# For cuEquivariance support, build with:
-# docker build --build-arg INSTALL_CUEQ=true --build-arg CUDA_BASE_IMAGE_TAG=12.6.1-cudnn-devel-ubuntu22.04 --build-arg BUILD_MODE=yaml .
-#
-ARG CUDA_BASE_IMAGE_TAG=12.1.1-cudnn8-devel-ubuntu22.04
-ARG INSTALL_CUEQ=false
 
+ARG CUDA_BASE_IMAGE_TAG=12.1.1-cudnn8-devel-ubuntu22.04
 
 FROM nvidia/cuda:${CUDA_BASE_IMAGE_TAG} AS builder
+ARG INSTALL_CUEQ=false
 
 # Environment mode: "lock" for reproducible builds, "yaml" for flexible dev builds
 ARG BUILD_MODE=yaml
@@ -141,8 +137,4 @@ FROM devel AS test
 WORKDIR /opt/openfold3
 # Install test dependencies and package
 RUN uv pip install --group=test \
-    && if [ "$INSTALL_CUEQ" = "true" ]; then \
-        uv pip install --no-build-isolation --editable ".[cuequivariance]"; \
-    else \
-        uv pip install --no-deps --editable "."; \
-    fi
+    && uv pip install --no-deps --editable ".";
