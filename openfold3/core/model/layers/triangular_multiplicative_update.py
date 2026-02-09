@@ -26,11 +26,9 @@ import torch
 import torch.nn as nn
 
 import openfold3.core.config.default_linear_init_config as lin_init
+from openfold3.core.kernels.cueq_utils import is_cuequivariance_available
 from openfold3.core.model.primitives import LayerNorm, Linear
-from openfold3.core.utils.tensor_utils import (
-    permute_final_dims,
-    is_cuequivariance_available,
-)
+from openfold3.core.utils.tensor_utils import permute_final_dims
 
 if is_cuequivariance_available():
     from cuequivariance_torch import triangle_multiplicative_update

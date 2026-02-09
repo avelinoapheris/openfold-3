@@ -17,7 +17,7 @@ import unittest
 
 import torch
 
-from openfold3.core.utils.tensor_utils import is_cuequivariance_available
+from openfold3.core.kernels.cueq_utils import is_cuequivariance_available
 
 
 def skip_unless_ds4s_installed():
