@@ -34,7 +34,7 @@ jobs:
           aws-region: us-east-1
       - name: Create cloud runner
         id: aws-start
-        uses: omsf/start-aws-gha-runner@v1.1.0
+        uses: omsf/start-aws-gha-runner@v1.1.1
         with:
           aws_image_id: ami-0754c6e75b3b97dcd  # Deep Learning AMI Neuron (Ubuntu 22.04)
           aws_instance_type: t3.2xlarge
@@ -98,11 +98,14 @@ jobs:
           find ${{ github.workspace }} -name "coverage.xml" -o -name ".coverage" 2>/dev/null || echo "No coverage files found"
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: coverage-report-${{ inputs.build_mode }}-${{ inputs.cuda_base_image_tag }}
-          path: coverage.xml
+          path: |
+            coverage.xml
+            .coverage
+          include-hidden-files: true
           retention-days: 30
 
   stop-aws-runner:
