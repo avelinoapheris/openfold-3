@@ -28,9 +28,10 @@ These fields are parsed by the DataModule to create the appropriate Dataset clas
 
 """
 
+import warnings
 from pathlib import Path
 from typing import Any
-import warnings
+
 from pydantic import (
     BaseModel,
     DirectoryPath,
@@ -76,8 +77,6 @@ class TrainingDatasetPaths(BaseModel):
 
     @model_validator(mode="after")
     def _validate_paths(self):
-        
-        
         def _validate_exactly_one_provided(
             group_name: str, path_values: list[Path | None]
         ):
@@ -87,7 +86,7 @@ class TrainingDatasetPaths(BaseModel):
                     f"Exactly one path in set of {group_name} should exist."
                     f" Found {existing_paths} exist."
                 )
-        
+
         _validate_exactly_one_provided(
             "alignment paths",
             [
@@ -96,18 +95,22 @@ class TrainingDatasetPaths(BaseModel):
                 self.alignment_array_directory,
             ],
         )
-        
-        def _validate_at_most_one_provided(group_name: str, path_values: list[Path | None]):
+
+        def _validate_at_most_one_provided(
+            group_name: str, path_values: list[Path | None]
+        ):
             existing_paths = [p for p in path_values if p is not None]
             if len(existing_paths) > 1:
                 raise ValueError(
                     f"At most one path in set of {group_name} should exist."
                     f" Found {existing_paths} exist."
                 )
-            
+
             if len(existing_paths) == 0:
                 warnings.warn(
-                    f"No {group_name} were provided. This dataset will not be able to use {group_name}."
+                    f"No {group_name} were provided."
+                    f" This dataset will not be able to use {group_name}.",
+                    stacklevel=2
                 )
 
         _validate_at_most_one_provided(
