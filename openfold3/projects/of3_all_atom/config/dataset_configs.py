@@ -29,7 +29,6 @@ These fields are parsed by the DataModule to create the appropriate Dataset clas
 """
 
 import warnings
-from pathlib import Path
 from typing import Any
 
 from pydantic import (
@@ -76,50 +75,60 @@ class TrainingDatasetPaths(BaseModel):
     use_roda_monomer_format: bool = False
 
     @model_validator(mode="after")
-    def _validate_paths(self):
-        def _validate_exactly_one_provided(
-            group_name: str, path_values: list[Path | None]
+    def _validate_alignment_paths(self):
+        path_values = [
+            self.alignments_directory,
+            self.alignment_db_directory,
+            self.alignment_array_directory,
+        ]
+        existing_paths = [p for p in path_values if p is not None]
+        if len(existing_paths) != 1:
+            raise ValueError(
+                f"Exactly one path in set of alignment paths should exist."
+                f" Found {existing_paths} exist."
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _validate_template_paths(self):
+        if (
+            self.template_structures_directory is not None
+            and self.template_structure_array_directory is not None
         ):
-            existing_paths = [p for p in path_values if p is not None]
-            if len(existing_paths) != 1:
-                raise ValueError(
-                    f"Exactly one path in set of {group_name} should exist."
-                    f" Found {existing_paths} exist."
-                )
+            raise ValueError(
+                "Only one template path should be provided. "
+                f"Found {self.template_structures_directory} "
+                f"and {self.template_structure_array_directory}."
+            )
 
-        _validate_exactly_one_provided(
-            "alignment paths",
-            [
-                self.alignments_directory,
-                self.alignment_db_directory,
-                self.alignment_array_directory,
-            ],
-        )
-
-        def _validate_at_most_one_provided(
-            group_name: str, path_values: list[Path | None]
+        if (
+            self.template_structures_directory is None
+            and self.template_structure_array_directory is None
         ):
-            existing_paths = [p for p in path_values if p is not None]
-            if len(existing_paths) > 1:
-                raise ValueError(
-                    f"At most one path in set of {group_name} should exist."
-                    f" Found {existing_paths} exist."
-                )
+            warnings.warn(
+                "No template paths provided. "
+                "Templates will not be used for this dataset.",
+                stacklevel=2,
+            )
 
-            if len(existing_paths) == 0:
-                warnings.warn(
-                    f"No {group_name} were provided."
-                    f" This dataset will not be able to use {group_name}.",
-                    stacklevel=2
-                )
+        if (
+            self.template_structures_directory is not None
+            and self.template_file_format not in ["cif", "pdb"]
+        ):
+            raise ValueError(
+                f"template_file_format must be one of: cif, pdb. "
+                f"Got: {self.template_file_format}"
+            )
 
-        _validate_at_most_one_provided(
-            "template paths",
-            [
-                self.template_structures_directory,
-                self.template_structure_array_directory,
-            ],
-        )
+        if (
+            self.template_structure_array_directory is not None
+            and self.template_file_format not in ["pkl", "npz"]
+        ):
+            raise ValueError(
+                f"template_file_format must be one of: pkl, npz. "
+                f"Got: {self.template_file_format}"
+            )
+
         return self
 
 
