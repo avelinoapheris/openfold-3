@@ -30,7 +30,7 @@ These fields are parsed by the DataModule to create the appropriate Dataset clas
 
 from pathlib import Path
 from typing import Any
-
+import warnings
 from pydantic import (
     BaseModel,
     DirectoryPath,
@@ -76,21 +76,19 @@ class TrainingDatasetPaths(BaseModel):
 
     @model_validator(mode="after")
     def _validate_paths(self):
-        def _validate_exactly_one_path_exists(
+        
+        
+        def _validate_exactly_one_provided(
             group_name: str, path_values: list[Path | None]
         ):
-            which_paths_exist = [p is not None for p in path_values]
-            if sum(which_paths_exist) > 1:
-                existing_paths = [
-                    p for p, b in zip(path_values, which_paths_exist, strict=True) if b
-                ]
+            existing_paths = [p for p in path_values if p is not None]
+            if len(existing_paths) != 1:
                 raise ValueError(
-                    "If there is a template folder, "
-                    f"exactly one path in set of {group_name} should exist."
-                    f"Found {existing_paths} exist."
+                    f"Exactly one path in set of {group_name} should exist."
+                    f" Found {existing_paths} exist."
                 )
-
-        _validate_exactly_one_path_exists(
+        
+        _validate_exactly_one_provided(
             "alignment paths",
             [
                 self.alignments_directory,
@@ -98,8 +96,22 @@ class TrainingDatasetPaths(BaseModel):
                 self.alignment_array_directory,
             ],
         )
-        _validate_exactly_one_path_exists(
-            "template_paths",
+        
+        def _validate_at_most_one_provided(group_name: str, path_values: list[Path | None]):
+            existing_paths = [p for p in path_values if p is not None]
+            if len(existing_paths) > 1:
+                raise ValueError(
+                    f"At most one path in set of {group_name} should exist."
+                    f" Found {existing_paths} exist."
+                )
+            
+            if len(existing_paths) == 0:
+                warnings.warn(
+                    f"No {group_name} were provided. This dataset will not be able to use {group_name}."
+                )
+
+        _validate_at_most_one_provided(
+            "template paths",
             [
                 self.template_structures_directory,
                 self.template_structure_array_directory,

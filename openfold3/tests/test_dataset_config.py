@@ -259,6 +259,29 @@ class TestOF3DatasetConfigConstruction:
                 }
             )
 
+    def test_dataset_config_with_no_template_paths(self, tmp_path):
+        """Test that dataset configs work when template paths are None."""
+        test_dummy_file = tmp_path / "test.json"
+        test_dummy_file.write_text("test")
+
+        with pytest.warns(UserWarning, match="No template paths were provided"):
+            config = TrainingDatasetPaths.model_validate(
+                {
+                    "alignments_directory": None,
+                    "alignment_array_directory": tmp_path,
+                    "dataset_cache_file": test_dummy_file,
+                    "target_structures_directory": tmp_path,
+                    "target_structure_file_format": "npz",
+                    "reference_molecule_directory": tmp_path,
+                    "template_structures_directory": None,
+                    "template_structure_array_directory": None,
+                    "template_file_format": None,
+                }
+            )
+
+        assert config.template_structures_directory is None
+        assert config.template_structure_array_directory is None
+
 
 class TestInferenceConfigConstruction:
     def test_inference_config_loading(self, tmp_path):
